@@ -11,12 +11,13 @@ import PhotosUI
 struct NewTicketView: View {
     @StateObject private var viewModel = NewTicketViewModel()
     @Environment(\.dismiss) private var dismiss
+    @State private var isSaving = false
     
     var openTicketsViewModel: OpenTicketsViewModel
 
     var body: some View {
-        NavigationStack() {
-            VStack (spacing: 15) {
+        NavigationStack {
+            VStack(spacing: 15) {
                 TextField("Reference", text: $viewModel.reference)
                     .lineLimit(15)
                     .padding(12)
@@ -73,16 +74,25 @@ struct NewTicketView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button ("Cancel") {
+                    Button("Cancel") {
                         dismiss()
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
-                        // data transfer to the openTicketsView
-                        let newTicket = viewModel.saveTicket()
-                        openTicketsViewModel.addTicket(newTicket)
-                        dismiss()
+                    // showing a loading image if the photos are not yet saved in the database
+                    if isSaving {
+                        ProgressView()
+                    } else {
+                        Button("Save") {
+                            Task {
+                                isSaving = true
+                                if let newTicket = await viewModel.saveTicket() {
+                                    openTicketsViewModel.addTicket(newTicket)
+                                    dismiss()
+                                }
+                                isSaving = false
+                            }
+                        }
                     }
                 }
             }

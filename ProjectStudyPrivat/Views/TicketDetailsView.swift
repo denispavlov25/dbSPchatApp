@@ -23,16 +23,48 @@ struct TicketDetailsView: View {
                     if let photos = ticket.appendedPhotos {
                         ScrollView(.horizontal) {
                             HStack(spacing: 10) {
-                                ForEach(photos.indices, id: \.self) { index in
-                                    Image(uiImage: UIImage(data: photos[index]) ?? UIImage())
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 110, height: 110)
-                                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .stroke(Color.black, lineWidth: 0.3)
-                                        )
+                                ForEach(photos, id: \.self) { photoURL in
+                                    if let url = URL(string: photoURL) {
+                                        // Using AsyncImage to load images asynchronously
+                                        AsyncImage(url: url) { phase in
+                                            switch phase {
+                                            // When image loading has not started
+                                            case .empty:
+                                                ProgressView()
+                                                    .frame(width: 110, height: 110)
+                                                    .background(Color.gray.opacity(0.1))
+                                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                            
+                                            // When image loading succeeds
+                                            case .success(let image):
+                                                image
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fill)
+                                                    .frame(width: 110, height: 110)
+                                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: 10)
+                                                            .stroke(Color.black, lineWidth: 0.3)
+                                                    )
+                                            
+                                            // When image loading fails
+                                            case .failure:
+                                                Image(systemName: "photo")
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fill)
+                                                    .frame(width: 110, height: 110)
+                                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: 10)
+                                                            .stroke(Color.black, lineWidth: 0.3)
+                                                    )
+                                            
+                                            // Default case for any unknown phase
+                                            @unknown default:
+                                                EmptyView()
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }

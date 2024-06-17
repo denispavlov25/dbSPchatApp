@@ -11,9 +11,9 @@ struct Ticket: Identifiable {
     var id = UUID()
     var reference: String
     var description: String
-    var appendedPhotos: [Data]?
+    var appendedPhotos: [String]?
     
-    init(reference: String, description: String, appendedPhotos: [Data]? = nil) {
+    init(reference: String, description: String, appendedPhotos: [String]? = nil) {
         self.reference = reference
         self.description = description
         self.appendedPhotos = appendedPhotos
