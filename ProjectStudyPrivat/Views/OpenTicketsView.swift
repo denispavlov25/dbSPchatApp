@@ -25,6 +25,11 @@ struct OpenTicketsView: View {
                 topBar
             }
         }
+        .onAppear {
+            Task {
+                await viewModel.fetchTickets()
+            }
+        }
     }
     
     // Views are split to make the code clearer
