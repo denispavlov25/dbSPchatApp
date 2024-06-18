@@ -8,13 +8,19 @@
 import Foundation
 import FirebaseDatabase
 import FirebaseStorage
+import FirebaseAuth
 
 class OpenTicketsViewModel: ObservableObject {
     @Published var isShowingMenu = false
     @Published var isAddButtonClicked = false
     @Published var tickets: [Ticket] = []
     
-    private let ref = Database.database().reference().child("tickets")
+    private lazy var ref: DatabaseReference = {
+        guard let userID = Auth.auth().currentUser?.uid else {
+            fatalError("Current user ID not found")
+        }
+        return Database.database().reference().child("users").child(userID).child("tickets")
+    }()
     
     func showMenu() {
         isShowingMenu.toggle()

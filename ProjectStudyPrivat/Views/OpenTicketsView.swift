@@ -10,7 +10,8 @@ import SwiftUI
 struct OpenTicketsView: View {
     @StateObject private var viewModel = OpenTicketsViewModel()
     @State private var selectedTicket: Ticket?
-    
+    @State private var showingAlert = false
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -30,6 +31,18 @@ struct OpenTicketsView: View {
                 await viewModel.fetchTickets()
             }
         }
+        .alert(isPresented: $showingAlert) {
+            Alert(
+                title: Text("Close Ticket"),
+                message: Text("Are you sure you want to close this ticket?"),
+                primaryButton: .default(Text("OK")) {
+                    if let selectedTicket = selectedTicket {
+                        viewModel.closeTicket(selectedTicket)
+                    }
+                },
+                secondaryButton: .cancel()
+            )
+        }
     }
     
     // Views are split to make the code clearer
@@ -41,8 +54,8 @@ struct OpenTicketsView: View {
                     TicketRowView(selectedTicket: $selectedTicket, ticket: ticket)
                         .swipeActions(edge: .trailing) {
                             Button(action: {
-                                // Handle close ticket action here
-                                viewModel.closeTicket(ticket)
+                                selectedTicket = ticket
+                                showingAlert = true
                             }) {
                                 Text("Close ticket")
                             }

@@ -10,6 +10,7 @@ import SwiftUI
 import PhotosUI
 import FirebaseDatabase
 import FirebaseStorage
+import FirebaseAuth
 
 class NewTicketViewModel: ObservableObject {
     @Published var shouldNavigate = false
@@ -18,8 +19,16 @@ class NewTicketViewModel: ObservableObject {
     @Published var appendItems: [PhotosPickerItem] = []
     @Published var appendImages: [UIImage] = []
 
-    private let ref = Database.database().reference().child("tickets")
+    private let currentUserID = Auth.auth().currentUser?.uid
+    private let ref: DatabaseReference
     private let storageRef = Storage.storage().reference().child("ticket_images")
+    
+    init() {
+        guard let userID = currentUserID else {
+            fatalError("Current user ID not found")
+        }
+        self.ref = Database.database().reference().child("users").child(userID).child("tickets")
+    }
 
     func saveTicket() async -> Ticket? {
         do {
@@ -42,7 +51,8 @@ class NewTicketViewModel: ObservableObject {
             ]
             
             // Save the ticket dictionary to Firebase
-            try await ref.child(reference).setValue(ticketDict)
+            let ticketRef = ref.childByAutoId()
+            try await ticketRef.setValue(ticketDict)
             
             return newTicket
         } catch {
