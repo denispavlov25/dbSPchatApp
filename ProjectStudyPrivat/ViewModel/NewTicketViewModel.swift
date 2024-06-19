@@ -87,4 +87,8 @@ class NewTicketViewModel: ObservableObject {
     func removeImage(at index: Int) {
         appendImages.remove(at: index)
     }
+    
+    func validateFields() -> Bool {
+        return !reference.isEmpty && !description.isEmpty
+    }
 }

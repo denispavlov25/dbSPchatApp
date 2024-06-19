@@ -35,12 +35,19 @@ class OpenTicketsViewModel: ObservableObject {
     }
     
     func closeTicket(_ ticket: Ticket) {
-        if let index = tickets.firstIndex(where: { $0.id == ticket.id }) {
+        if let index = tickets.firstIndex(where: { $0.reference == ticket.reference }) {
             // remove locally
             tickets.remove(at: index)
+        }
+        
+        // remove from Firebase
+        ref.queryOrdered(byChild: "reference").queryEqual(toValue: ticket.reference).observeSingleEvent(of: .value) { snapshot in
+            guard let ticketSnapshot = snapshot.children.allObjects.first as? DataSnapshot else {
+                print("Ticket not found in Firebase")
+                return
+            }
             
-            // remove from Firebase
-            ref.child(ticket.reference).removeValue { error, _ in
+            ticketSnapshot.ref.removeValue { error, _ in
                 if let error = error {
                     print("Failed to remove ticket from Firebase: \(error.localizedDescription)")
                 } else {
@@ -58,14 +65,17 @@ class OpenTicketsViewModel: ObservableObject {
                 var fetchedTickets: [Ticket] = []
                 
                 for child in snapshot.children {
-                    if let childSnapshot = child as? DataSnapshot,
-                       let ticketDict = childSnapshot.value as? [String: Any],
-                       let reference = ticketDict["reference"] as? String,
-                       let description = ticketDict["description"] as? String,
-                       let appendedPhotos = ticketDict["appendedPhotos"] as? [String] {
-                        let ticket = Ticket(reference: reference, description: description, appendedPhotos: appendedPhotos)
-                        fetchedTickets.append(ticket)
+                    guard let childSnapshot = child as? DataSnapshot,
+                          let ticketDict = childSnapshot.value as? [String: Any],
+                          let reference = ticketDict["reference"] as? String,
+                          let description = ticketDict["description"] as? String else {
+                        // Skip if essential properties are missing
+                        continue
                     }
+                    
+                    let appendedPhotos = ticketDict["appendedPhotos"] as? [String]
+                    let ticket = Ticket(reference: reference, description: description, appendedPhotos: appendedPhotos)
+                    fetchedTickets.append(ticket)
                 }
                 
                 self.tickets = fetchedTickets

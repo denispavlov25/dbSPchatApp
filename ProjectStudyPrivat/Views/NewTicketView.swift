@@ -12,6 +12,7 @@ struct NewTicketView: View {
     @StateObject private var viewModel = NewTicketViewModel()
     @Environment(\.dismiss) private var dismiss
     @State private var isSaving = false
+    @State private var showEmptyFieldsAlert = false
     
     var openTicketsViewModel: OpenTicketsViewModel
 
@@ -85,13 +86,20 @@ struct NewTicketView: View {
                     } else {
                         Button("Save") {
                             Task {
-                                isSaving = true
-                                if let newTicket = await viewModel.saveTicket() {
-                                    openTicketsViewModel.addTicket(newTicket)
-                                    dismiss()
+                                if viewModel.validateFields() {
+                                    isSaving = true
+                                    if let newTicket = await viewModel.saveTicket() {
+                                        openTicketsViewModel.addTicket(newTicket)
+                                        dismiss()
+                                    }
+                                    isSaving = false
+                                } else {
+                                    showEmptyFieldsAlert = true
                                 }
-                                isSaving = false
                             }
+                        }
+                        .alert(isPresented: $showEmptyFieldsAlert) {
+                            Alert(title: Text("Empty Fields"), message: Text("Please fill out both 'Reference' and 'Description' fields."), dismissButton: .default(Text("OK")))
                         }
                     }
                 }
