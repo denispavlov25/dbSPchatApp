@@ -8,17 +8,30 @@
 import SwiftUI
 
 struct SideMenuRowView: View {
+    @State private var navigateToLoginView = false
+    
     var body: some View {
-        HStack {
-            Image(systemName: "person.fill")
-                .imageScale(.medium)
-            
-            Text("Profile")
-                .font(.title3)
-            
-            Spacer()
+        NavigationStack {
+            HStack {
+                Image(systemName: "rectangle.portrait.and.arrow.forward.fill")
+                    .imageScale(.medium)
+                    .foregroundStyle(Color.red)
+                Button {
+                    navigateToLoginView = true
+                } label: {
+                    Text("Log out")
+                        .font(.title3)
+                        .foregroundStyle(Color.black)
+                }
+                
+                Spacer()
+            }
+            .padding(.leading)
         }
-        .padding(.leading)
+        .navigationDestination(isPresented: $navigateToLoginView) {
+            LoginView()
+                .navigationBarBackButtonHidden(true)
+        }
     }
 }
 
