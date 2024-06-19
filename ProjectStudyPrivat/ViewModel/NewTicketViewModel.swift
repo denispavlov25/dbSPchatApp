@@ -19,12 +19,11 @@ class NewTicketViewModel: ObservableObject {
     @Published var appendItems: [PhotosPickerItem] = []
     @Published var appendImages: [UIImage] = []
 
-    private let currentUserID = Auth.auth().currentUser?.uid
     private let ref: DatabaseReference
     private let storageRef = Storage.storage().reference().child("ticket_images")
     
     init() {
-        guard let userID = currentUserID else {
+        guard let userID = Auth.auth().currentUser?.uid else {
             fatalError("Current user ID not found")
         }
         self.ref = Database.database().reference().child("users").child(userID).child("tickets")
@@ -63,6 +62,10 @@ class NewTicketViewModel: ObservableObject {
     
     //saving the chosen images to the firebase storage
     private func uploadImages() async throws -> [String] {
+        guard Auth.auth().currentUser != nil else {
+            fatalError("User not authenticated")
+        }
+        
         var imageURLs: [String] = []
         
         for (index, image) in appendImages.enumerated() {
