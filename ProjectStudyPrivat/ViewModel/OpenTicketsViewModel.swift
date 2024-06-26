@@ -41,18 +41,11 @@ class OpenTicketsViewModel: ObservableObject {
         }
         
         // remove from Firebase
-        ref.queryOrdered(byChild: "reference").queryEqual(toValue: ticket.reference).observeSingleEvent(of: .value) { snapshot in
-            guard let ticketSnapshot = snapshot.children.allObjects.first as? DataSnapshot else {
-                print("Ticket not found in Firebase")
-                return
-            }
-            
-            ticketSnapshot.ref.removeValue { error, _ in
-                if let error = error {
-                    print("Failed to remove ticket from Firebase: \(error.localizedDescription)")
-                } else {
-                    print("Ticket removed successfully from Firebase")
-                }
+        ref.child(ticket.id.uuidString).removeValue { error, _ in
+            if let error = error {
+                print("Failed to remove ticket from Firebase: \(error.localizedDescription)")
+            } else {
+                print("Ticket removed successfully from Firebase")
             }
         }
     }

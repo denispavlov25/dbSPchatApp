@@ -8,12 +8,16 @@
 import SwiftUI
 
 struct ChatView: View {
-    @StateObject private var viewModel = ChatViewModel()
+    @StateObject private var viewModel: ChatViewModel
     @Environment(\.dismiss) private var dismiss
-    @State private var chatText = ""
     
     var ticket: Ticket
     var messages = ["Message 1", "Message 2", "Message 3", "Message 4", "Message 5", "Message 6", "Message 7", "Message 8"]
+    
+    init(ticket: Ticket) {
+        self.ticket = ticket
+        _viewModel = StateObject(wrappedValue: ChatViewModel(ticket: ticket))
+    }
     
     var body: some View {
         NavigationView {
@@ -43,12 +47,12 @@ struct ChatView: View {
                     ZStack(alignment: .leading) {
                         Text("Message")
                             .padding(.leading, 5)
-                        TextEditor(text: $chatText)
-                            .opacity(chatText.isEmpty ? 0.5 : 1)
+                        TextEditor(text: $viewModel.chatText)
+                            .opacity(viewModel.chatText.isEmpty ? 0.5 : 1)
                     }
                     .frame(height: 40)
                     Button(action: {
-                        viewModel.handleSend(text: chatText)
+                        viewModel.handleSend()
                     }) {
                         Text("Send")
                             .foregroundColor(.white)

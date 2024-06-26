@@ -50,7 +50,7 @@ class NewTicketViewModel: ObservableObject {
             ]
             
             // Save the ticket dictionary to Firebase
-            let ticketRef = ref.childByAutoId()
+            let ticketRef = ref.child(newTicket.id.uuidString)
             try await ticketRef.setValue(ticketDict)
             
             return newTicket
