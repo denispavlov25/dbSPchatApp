@@ -9,6 +9,7 @@ import Foundation
 
 class TicketRowViewModel: ObservableObject {
     @Published var shouldNavigate = false
+    @Published var navigateToChatView = false
     @Published var isInfoButtonClicked = false
 
     private func addNewTicket() {
@@ -18,5 +19,8 @@ class TicketRowViewModel: ObservableObject {
     func showInfoTicketDialog() {
         isInfoButtonClicked.toggle()
     }
-
+    
+    func showChatDialog() {
+        navigateToChatView.toggle()
+    }
 }

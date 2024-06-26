@@ -17,8 +17,15 @@ struct TicketRowView: View {
     var body: some View {
         HStack {
             // change the color of selected text
-            Text(ticket.reference)
-                .foregroundColor(isHighlighted ? .gray : .primary)
+            Button(action: {
+                viewModel.navigateToChatView = true
+            }) {
+                Text(ticket.reference)
+                    .foregroundStyle(Color.black)
+            }
+            .sheet(isPresented: $viewModel.navigateToChatView, content: {
+                ChatView(ticket: ticket)
+            })
             
             Spacer()
             
@@ -26,6 +33,7 @@ struct TicketRowView: View {
                 viewModel.showInfoTicketDialog()
             }) {
                 Image(systemName: "info.circle")
+                    .foregroundStyle(Color.blue)
                     .padding()
             }
             .buttonStyle(PlainButtonStyle())
@@ -34,20 +42,6 @@ struct TicketRowView: View {
             })
         }
         .contentShape(Rectangle())
-        .onTapGesture {
-            // color will change after 0.3 seconds after clicking the button
-            isHighlighted = true
-            openChat(ticket)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                isHighlighted = false
-            }
-        }
-    }
-    
-    private func openChat(_ ticket: Ticket) {
-        selectedTicket = ticket
-        print("Ticket is clicked \(ticket.reference)")
-        // have to implement: chat with support
     }
 }
 

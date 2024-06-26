@@ -32,6 +32,8 @@
 		BA53EF7F2C186B93003736D2 /* OpenTicketsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA53EF7E2C186B93003736D2 /* OpenTicketsViewModel.swift */; };
 		BA53EF812C186BA7003736D2 /* TicketRowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA53EF802C186BA7003736D2 /* TicketRowViewModel.swift */; };
 		BA65802B2C1897C600B31A68 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BA65802A2C1897C600B31A68 /* GoogleService-Info.plist */; };
+		BA7D7EA72C2C034F006D74B2 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7D7EA62C2C034F006D74B2 /* ChatView.swift */; };
+		BAE7CFE02C2C43A400BCD12E /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE7CFDF2C2C43A400BCD12E /* ChatViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +55,8 @@
 		BA53EF802C186BA7003736D2 /* TicketRowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketRowViewModel.swift; sourceTree = "<group>"; };
 		BA65802A2C1897C600B31A68 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BA65802C2C1897CC00B31A68 /* firebase-ios-sdk-main */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "firebase-ios-sdk-main"; path = "../../../../../Downloads/firebase-ios-sdk-main"; sourceTree = "<group>"; };
+		BA7D7EA62C2C034F006D74B2 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		BAE7CFDF2C2C43A400BCD12E /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,6 +144,7 @@
 				BA53EF742C186B20003736D2 /* SideMenuView.swift */,
 				BA53EF762C186B34003736D2 /* TicketDetailsView.swift */,
 				BA53EF782C186B4B003736D2 /* TicketRowView.swift */,
+				BA7D7EA62C2C034F006D74B2 /* ChatView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -151,6 +156,7 @@
 				BA53EF7C2C186B7E003736D2 /* NewTicketViewModel.swift */,
 				BA53EF7E2C186B93003736D2 /* OpenTicketsViewModel.swift */,
 				BA53EF802C186BA7003736D2 /* TicketRowViewModel.swift */,
+				BAE7CFDF2C2C43A400BCD12E /* ChatViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -241,6 +247,7 @@
 				BA53EF6D2C186AAD003736D2 /* LoginView.swift in Sources */,
 				BA53EF752C186B20003736D2 /* SideMenuView.swift in Sources */,
 				BA53EF792C186B4B003736D2 /* TicketRowView.swift in Sources */,
+				BA7D7EA72C2C034F006D74B2 /* ChatView.swift in Sources */,
 				BA53EF272C18598E003736D2 /* ProjectStudyPrivatApp.swift in Sources */,
 				BA53EF6B2C186A83003736D2 /* Ticket.swift in Sources */,
 				BA53EF712C186AE1003736D2 /* OpenTicketsView.swift in Sources */,
@@ -249,6 +256,7 @@
 				BA53EF7B2C186B65003736D2 /* LoginViewModel.swift in Sources */,
 				BA53EF812C186BA7003736D2 /* TicketRowViewModel.swift in Sources */,
 				BA53EF7F2C186B93003736D2 /* OpenTicketsViewModel.swift in Sources */,
+				BAE7CFE02C2C43A400BCD12E /* ChatViewModel.swift in Sources */,
 				BA53EF772C186B34003736D2 /* TicketDetailsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
