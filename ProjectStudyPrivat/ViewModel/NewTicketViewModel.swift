@@ -40,7 +40,7 @@ class NewTicketViewModel: ObservableObject {
             }
             
             // Create the ticket
-            let newTicket = Ticket(reference: reference, description: description, appendedPhotos: imageURLs)
+            let newTicket = Ticket(id: UUID(), reference: reference, description: description, appendedPhotos: imageURLs)
             
             // Convert the ticket to a dictionary
             let ticketDict: [String: Any] = [

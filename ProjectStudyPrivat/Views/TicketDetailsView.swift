@@ -115,5 +115,5 @@ struct DetailField: View {
 }
 
 #Preview {
-    TicketDetailsView(ticket: Ticket(reference: "Example Ticket", description: "Example Description"))
+    TicketDetailsView(ticket: Ticket(id: UUID(), reference: "Example Ticket", description: "Example Description"))
 }

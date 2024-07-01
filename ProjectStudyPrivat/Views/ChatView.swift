@@ -12,7 +12,6 @@ struct ChatView: View {
     @Environment(\.dismiss) private var dismiss
     
     var ticket: Ticket
-    var messages = ["Message 1", "Message 2", "Message 3", "Message 4", "Message 5", "Message 6", "Message 7", "Message 8"]
     
     init(ticket: Ticket) {
         self.ticket = ticket
@@ -25,9 +24,9 @@ struct ChatView: View {
                 ScrollView {
                     HStack {
                         Spacer()
-                        VStack(spacing: 10) {
-                            ForEach(messages, id: \.self) { message in
-                                Text(message)
+                        VStack(alignment: .trailing, spacing: 10) {
+                            ForEach(viewModel.messages) { message in
+                                Text(message.text)
                                     .padding()
                                     .foregroundColor(.white)
                                     .background(Color.blue)
@@ -76,5 +75,5 @@ struct ChatView: View {
 }
 
 #Preview {
-    ChatView(ticket: Ticket(reference: "Example Ticket", description: "Example Description"))
+    ChatView(ticket: Ticket(id: UUID(), reference: "Example Ticket", description: "Example Description"))
 }

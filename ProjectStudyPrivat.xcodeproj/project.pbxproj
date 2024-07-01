@@ -34,6 +34,7 @@
 		BA65802B2C1897C600B31A68 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BA65802A2C1897C600B31A68 /* GoogleService-Info.plist */; };
 		BA7D7EA72C2C034F006D74B2 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7D7EA62C2C034F006D74B2 /* ChatView.swift */; };
 		BAE7CFE02C2C43A400BCD12E /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE7CFDF2C2C43A400BCD12E /* ChatViewModel.swift */; };
+		BAE7CFE22C2D6A4800BCD12E /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE7CFE12C2D6A4800BCD12E /* Message.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -57,6 +58,7 @@
 		BA65802C2C1897CC00B31A68 /* firebase-ios-sdk-main */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "firebase-ios-sdk-main"; path = "../../../../../Downloads/firebase-ios-sdk-main"; sourceTree = "<group>"; };
 		BA7D7EA62C2C034F006D74B2 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		BAE7CFDF2C2C43A400BCD12E /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
+		BAE7CFE12C2D6A4800BCD12E /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +132,7 @@
 			isa = PBXGroup;
 			children = (
 				BA53EF6A2C186A83003736D2 /* Ticket.swift */,
+				BAE7CFE12C2D6A4800BCD12E /* Message.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -256,6 +259,7 @@
 				BA53EF7B2C186B65003736D2 /* LoginViewModel.swift in Sources */,
 				BA53EF812C186BA7003736D2 /* TicketRowViewModel.swift in Sources */,
 				BA53EF7F2C186B93003736D2 /* OpenTicketsViewModel.swift in Sources */,
+				BAE7CFE22C2D6A4800BCD12E /* Message.swift in Sources */,
 				BAE7CFE02C2C43A400BCD12E /* ChatViewModel.swift in Sources */,
 				BA53EF772C186B34003736D2 /* TicketDetailsView.swift in Sources */,
 			);

@@ -46,5 +46,5 @@ struct TicketRowView: View {
 }
 
 #Preview {
-    TicketRowView(selectedTicket: .constant(nil), ticket: Ticket(reference: "Example Ticket", description: "Example Description"))
+    TicketRowView(selectedTicket: .constant(nil), ticket: Ticket(id: UUID(), reference: "Example Ticket", description: "Example Description"))
 }

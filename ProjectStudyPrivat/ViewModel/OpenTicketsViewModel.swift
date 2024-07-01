@@ -67,7 +67,7 @@ class OpenTicketsViewModel: ObservableObject {
                     }
                     
                     let appendedPhotos = ticketDict["appendedPhotos"] as? [String]
-                    let ticket = Ticket(reference: reference, description: description, appendedPhotos: appendedPhotos)
+                    let ticket = Ticket(id: UUID(uuidString: childSnapshot.key)!, reference: reference, description: description, appendedPhotos: appendedPhotos)
                     fetchedTickets.append(ticket)
                 }
                 
