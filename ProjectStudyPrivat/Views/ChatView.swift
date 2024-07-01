@@ -19,7 +19,7 @@ struct ChatView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 ScrollView {
                     HStack {
@@ -69,6 +69,11 @@ struct ChatView: View {
                         dismiss()
                     }
                 }
+            }
+        }
+        .onAppear {
+            Task {
+                await viewModel.fetchMessages()
             }
         }
     }

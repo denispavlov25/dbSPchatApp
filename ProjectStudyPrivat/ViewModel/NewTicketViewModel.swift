@@ -33,23 +33,23 @@ class NewTicketViewModel: ObservableObject {
         do {
             let imageURLs = try await uploadImages()
             
-            // Check if image URLs are successfully uploaded
+            //checking if image URLs are successfully uploaded
             guard !imageURLs.isEmpty || appendImages.isEmpty else {
                 print("Failed to upload images")
                 return nil
             }
             
-            // Create the ticket
+            //creating the ticket
             let newTicket = Ticket(id: UUID(), reference: reference, description: description, appendedPhotos: imageURLs)
             
-            // Convert the ticket to a dictionary
+            //converting the ticket to a dictionary
             let ticketDict: [String: Any] = [
                 "reference": newTicket.reference,
                 "description": newTicket.description,
                 "appendedPhotos": imageURLs
             ]
             
-            // Save the ticket dictionary to Firebase
+            //saving the ticket dictionary to firebase
             let ticketRef = ref.child(newTicket.id.uuidString)
             try await ticketRef.setValue(ticketDict)
             
@@ -62,17 +62,19 @@ class NewTicketViewModel: ObservableObject {
     
     //saving the chosen images to the firebase storage
     private func uploadImages() async throws -> [String] {
-        guard Auth.auth().currentUser != nil else {
-            fatalError("User not authenticated")
-        }
-        
+        //initializing an empty array to store the URLs of the uploaded images
         var imageURLs: [String] = []
         
         for (index, image) in appendImages.enumerated() {
+            //converting the UIImage to JPEG data
             guard let imageData = image.jpegData(compressionQuality: 0.8) else { continue }
+            //creating a reference in firebase for the image with a unique name
             let imageRef = storageRef.child("\(reference)_\(index).jpg")
             
+            //uploading the image data to firebase
             _ = try await imageRef.putDataAsync(imageData)
+            
+            //retrieving the download URL for the uploaded image
             let imageURL = try await imageRef.downloadURL()
             imageURLs.append(imageURL.absoluteString)
         }

@@ -32,16 +32,16 @@ struct NewTicketView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .padding(.bottom, 30)
                 
-                // adding photos
+                //adding photos
                 PhotosPicker("Append Photos", selection: $viewModel.appendItems, maxSelectionCount: 5, selectionBehavior: .ordered)
                 
                 Spacer()
                 
-                // multiple choosing of photos
+                //multiple choosing of photos
                 ScrollView(.horizontal) {
                     HStack(spacing: 10) {
                         ForEach(viewModel.appendImages.indices, id: \.self) { index in
-                            // removing photos by clicking on them
+                            //removing photos by clicking on them
                             Button(action: {
                                 viewModel.removeImage(at: index)
                             }) {
@@ -51,6 +51,7 @@ struct NewTicketView: View {
                                     .frame(width: 110, height: 110)
                                     .clipShape(RoundedRectangle(cornerRadius: 10))
                                     .overlay(
+                                        //applying a stroke (border) to the rounded rectangle with a black color and a line as an overlay
                                         RoundedRectangle(cornerRadius: 10)
                                             .stroke(Color.black, lineWidth: 0.3)
                                     )
@@ -80,7 +81,7 @@ struct NewTicketView: View {
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    // showing a loading image if the photos are not yet saved in the database
+                    //showing a loading image if the photos are not yet saved in the database
                     if isSaving {
                         ProgressView()
                     } else {

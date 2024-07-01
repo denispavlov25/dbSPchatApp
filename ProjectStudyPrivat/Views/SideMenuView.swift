@@ -33,6 +33,7 @@ struct SideMenuView: View {
                 }
             }
         }
+        //moving the view in/out from the left edge
         .transition(.move(edge: .leading))
         .animation(.easeOut, value: isShowing)
     }

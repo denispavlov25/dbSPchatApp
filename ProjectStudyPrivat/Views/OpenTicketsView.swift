@@ -45,10 +45,10 @@ struct OpenTicketsView: View {
         }
     }
     
-    // Views are split to make the code clearer
+    //views are split to make the code clearer
     private var ticketListView: some View {
         VStack {
-            // Tickets are passed to the TicketRowView
+            //tickets are passed to the TicketRowView
             List {
                 ForEach(viewModel.tickets) { ticket in
                     TicketRowView(selectedTicket: $selectedTicket, ticket: ticket)
@@ -70,6 +70,7 @@ struct OpenTicketsView: View {
         Group {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
+                    //opening the menu
                     viewModel.showMenu()
                 }, label: {
                     Image(systemName: "line.3.horizontal")
@@ -77,6 +78,7 @@ struct OpenTicketsView: View {
             }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
+                    //opening the sheet to create a new ticket
                     viewModel.showNewTicketDialog()
                 }, label: {
                     Image(systemName: "plus")

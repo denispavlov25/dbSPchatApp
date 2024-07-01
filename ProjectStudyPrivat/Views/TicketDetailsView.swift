@@ -13,29 +13,29 @@ struct TicketDetailsView: View {
     var ticket: Ticket
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 30) {
                     DetailField(title: "Reference", content: ticket.reference)
                     DetailField(title: "Description", content: ticket.description)
                     
-                    // showing append photos
+                    //showing append photos
                     if let photos = ticket.appendedPhotos {
                         ScrollView(.horizontal) {
                             HStack(spacing: 10) {
                                 ForEach(photos, id: \.self) { photoURL in
                                     if let url = URL(string: photoURL) {
-                                        // Using AsyncImage to load images asynchronously
+                                        //using AsyncImage to load images asynchronously
                                         AsyncImage(url: url) { phase in
                                             switch phase {
-                                            // When image loading has not started
+                                            //when image loading has not started
                                             case .empty:
                                                 ProgressView()
                                                     .frame(width: 110, height: 110)
                                                     .background(Color.gray.opacity(0.1))
                                                     .clipShape(RoundedRectangle(cornerRadius: 10))
                                             
-                                            // When image loading succeeds
+                                            //when image loading succeeds
                                             case .success(let image):
                                                 image
                                                     .resizable()
@@ -47,7 +47,7 @@ struct TicketDetailsView: View {
                                                             .stroke(Color.black, lineWidth: 0.3)
                                                     )
                                             
-                                            // When image loading fails
+                                            //when image loading fails
                                             case .failure:
                                                 Image(systemName: "photo")
                                                     .resizable()
@@ -59,8 +59,8 @@ struct TicketDetailsView: View {
                                                             .stroke(Color.black, lineWidth: 0.3)
                                                     )
                                             
-                                            // Default case for any unknown phase
-                                            @unknown default:
+                                            //default case for any unknown phase
+                                            default:
                                                 EmptyView()
                                             }
                                         }
@@ -86,7 +86,7 @@ struct TicketDetailsView: View {
     }
 }
 
-// reference and description
+//reference and description fields
 struct DetailField: View {
     var title: String
     var content: String

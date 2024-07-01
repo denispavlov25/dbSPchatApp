@@ -23,29 +23,35 @@ class ChatViewModel: ObservableObject {
             fatalError("Current user ID not found")
         }
         self.ref = Database.database().reference().child("users").child(userID).child("tickets").child(ticket.id.uuidString).child("messages")
-        
-        Task {
-            await fetchMessages()
-        }
     }
     
     func handleSend() {
+        //ensuring the chatText is not empty
         guard !chatText.isEmpty else { return }
         
+        //generating a unique id
         let messageId = UUID().uuidString
+        //get standard timestamp
+        let unixTimestamp = Date().timeIntervalSince1970
+        //creating a dictionary containing the message data
         let messageDict: [String: Any] = [
             "text": chatText,
-            "timestamp": ServerValue.timestamp()
+            "timestamp": unixTimestamp
         ]
         
+        //reference to the specific message
         let messageRef = ref.child(messageId)
         
+        //set the message data to the firebase
         messageRef.setValue(messageDict) { error, _ in
             if let error = error {
                 print("Error sending message: \(error.localizedDescription)")
             } else {
                 print("Message sent successfully!")
+                //clear chatText after sending message
                 self.chatText = ""
+                
+                //fetching updated messages asynchronously on the ui
                 Task {
                     await self.fetchMessages()
                 }
@@ -63,16 +69,16 @@ class ChatViewModel: ObservableObject {
                 for child in snapshot.children.allObjects as! [DataSnapshot] {
                     guard let messageDict = child.value as? [String: Any],
                           let text = messageDict["text"] as? String,
-                          let timestampDouble = messageDict["timestamp"] as? Double,
-                          let id = UUID(uuidString: child.key) else {
-                        print("Invalid or incomplete data in \(child.key)")
+                          let timestamp = messageDict["timestamp"] as? Double else {
                         continue
                     }
-                    
-                    let timestamp = Date(timeIntervalSince1970: timestampDouble / 1000)
-                    
-                    let message = Message(id: id, text: text, timestamp: timestamp)
-                    fetchedMessages.append(message)
+
+                    if let messageId = UUID(uuidString: child.key) {
+                        let message = Message(id: messageId, text: text, timestamp: timestamp)
+                        fetchedMessages.append(message)
+                    } else {
+                        print("Invalid UUID string: \(child.key)")
+                    }
                 }
                 
                 self.messages = fetchedMessages.sorted { $0.timestamp < $1.timestamp }

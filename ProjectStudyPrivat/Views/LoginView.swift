@@ -75,12 +75,16 @@ struct LoginView: View {
                 .onChange(of: avatarItem) { _, _ in
                     Task {
                         if let avatarItem,
+                           //loading data asynchronously from avatarItem
                            let data = try? await avatarItem.loadTransferable(type: Data.self) {
                             if let image = UIImage(data: data) {
+                                //if data successfully loaded, assigning it to avatarImage
                                 avatarImage = image
+                                //converting the image to JPEG data
                                 viewModel.avatarImageData = image.jpegData(compressionQuality: 0.4)
                             }
                         }
+                        //clear avatarItem
                         avatarItem = nil
                     }
                 }

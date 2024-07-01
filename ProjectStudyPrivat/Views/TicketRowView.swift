@@ -16,7 +16,6 @@ struct TicketRowView: View {
     
     var body: some View {
         HStack {
-            // change the color of selected text
             Button(action: {
                 viewModel.navigateToChatView = true
             }) {
@@ -36,6 +35,7 @@ struct TicketRowView: View {
                     .foregroundStyle(Color.blue)
                     .padding()
             }
+            //removing the default button styling to make the info button appear as a simple tappable area
             .buttonStyle(PlainButtonStyle())
             .sheet(isPresented: $viewModel.isInfoButtonClicked, content: {
                 TicketDetailsView(ticket: ticket)
