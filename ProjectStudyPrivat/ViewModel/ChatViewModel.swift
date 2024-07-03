@@ -8,13 +8,19 @@
 import Foundation
 import FirebaseDatabase
 import FirebaseAuth
+import PhotosUI
+import SwiftUI
+import FirebaseStorage
 
 class ChatViewModel: ObservableObject {
     @Published var chatText = ""
     @Published var messages: [Message] = []
+    @Published var appendImages: [UIImage] = []
+    @Published var appendItems: [PhotosPickerItem] = []
     
     private let ticket: Ticket
     private let ref: DatabaseReference
+    private let storageRef: StorageReference
     
     init(ticket: Ticket) {
         self.ticket = ticket
@@ -23,22 +29,44 @@ class ChatViewModel: ObservableObject {
             fatalError("Current user ID not found")
         }
         self.ref = Database.database().reference().child("users").child(userID).child("tickets").child(ticket.id.uuidString).child("messages")
+        self.storageRef = Storage.storage().reference().child("ticket_images")
     }
     
     func handleSend() {
         //ensuring the chatText is not empty
-        guard !chatText.isEmpty else { return }
+        guard !chatText.isEmpty || !appendImages.isEmpty else { return }
         
         //generating a unique id
         let messageId = UUID().uuidString
         //get standard timestamp
         let unixTimestamp = Date().timeIntervalSince1970
         //creating a dictionary containing the message data
-        let messageDict: [String: Any] = [
-            "text": chatText,
-            "timestamp": unixTimestamp
-        ]
         
+        if !appendImages.isEmpty {
+            Task {
+                do {
+                    let imageUrls = try await uploadImages(messageId: messageId)
+                    let messageDict: [String: Any] = [
+                        "text": chatText,
+                        "timestamp": unixTimestamp,
+                        "appendedImages": imageUrls
+                    ]
+                    
+                    sendMessage(messageId: messageId, messageDict: messageDict)
+                } catch {
+                    print("Error uploading images: \(error.localizedDescription)")
+                }
+            }
+        } else {
+            let messageDict: [String: Any] = [
+                "text": chatText,
+                "timestamp": unixTimestamp
+            ]
+            sendMessage(messageId: messageId, messageDict: messageDict)
+        }
+    }
+        
+    private func sendMessage(messageId: String, messageDict: [String: Any]) {
         //reference to the specific message
         let messageRef = ref.child(messageId)
         
@@ -48,8 +76,9 @@ class ChatViewModel: ObservableObject {
                 print("Error sending message: \(error.localizedDescription)")
             } else {
                 print("Message sent successfully!")
-                //clear chatText after sending message
+                //clear chatText and appendImages after sending message
                 self.chatText = ""
+                self.appendImages.removeAll()
                 
                 //fetching updated messages asynchronously on the ui
                 Task {
@@ -57,6 +86,34 @@ class ChatViewModel: ObservableObject {
                 }
             }
         }
+    }
+    
+    private func uploadImages(messageId: String) async throws -> [String] {
+        var imageURLs: [String] = []
+        
+        for (index, image) in appendImages.enumerated() {
+            guard let imageData = image.jpegData(compressionQuality: 0.8) else { continue }
+            let imageRef = self.storageRef.child("\(ticket.id.uuidString)_\(index).jpg")
+            
+            do {
+                _ = try await imageRef.putDataAsync(imageData)
+                
+                let imageURL = try await imageRef.downloadURL()
+                imageURLs.append(imageURL.absoluteString)
+            } catch {
+                print("Error uploading image: \(error.localizedDescription)")
+            }
+        }
+        
+        return imageURLs
+    }
+    
+    func addImage(_ image: UIImage) {
+        appendImages.append(image)
+    }
+    
+    func removeImage(at index: Int) {
+        appendImages.remove(at: index)
     }
     
     func fetchMessages() async {
@@ -72,9 +129,11 @@ class ChatViewModel: ObservableObject {
                           let timestamp = messageDict["timestamp"] as? Double else {
                         continue
                     }
+                    
+                    let appendedImages = messageDict["appendedImages"] as? [String]
 
                     if let messageId = UUID(uuidString: child.key) {
-                        let message = Message(id: messageId, text: text, timestamp: timestamp)
+                        let message = Message(id: messageId, text: text, timestamp: timestamp, appendedImages: appendedImages)
                         fetchedMessages.append(message)
                     } else {
                         print("Invalid UUID string: \(child.key)")

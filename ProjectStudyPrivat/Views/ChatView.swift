@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct ChatView: View {
     @StateObject private var viewModel: ChatViewModel
@@ -26,11 +27,27 @@ struct ChatView: View {
                         Spacer()
                         VStack(alignment: .trailing, spacing: 10) {
                             ForEach(viewModel.messages) { message in
-                                Text(message.text)
-                                    .padding()
-                                    .foregroundColor(.white)
-                                    .background(Color.blue)
-                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                if let imageURLs = message.appendedImages {
+                                    ForEach(imageURLs, id: \.self) { url in
+                                        if let imageURL = URL(string: url) {
+                                            AsyncImage(url: imageURL) { image in
+                                                image
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fill)
+                                                    .frame(width: 80, height: 80)
+                                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                            } placeholder: {
+                                                ProgressView()
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    Text(message.text)
+                                        .padding()
+                                        .foregroundColor(.white)
+                                        .background(Color.blue)
+                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                                }
                             }
                         }
                     }
@@ -41,8 +58,10 @@ struct ChatView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 
                 HStack {
-                    Image(systemName: "photo.on.rectangle")
-                        .padding(.leading, 10)
+                    PhotosPicker(selection: $viewModel.appendItems) {
+                        Image(systemName: "paperclip")
+                            .padding(.leading, 10)
+                    }
                     ZStack(alignment: .leading) {
                         Text("Message")
                             .padding(.leading, 5)
@@ -62,6 +81,23 @@ struct ChatView: View {
                     }
                     .padding()
                 }
+                
+                ScrollView(.horizontal) {
+                    HStack(spacing: 10) {
+                        ForEach(viewModel.appendImages.indices, id: \.self) { index in
+                            Button(action: {
+                                viewModel.removeImage(at: index)
+                            }) {
+                                Image(uiImage: viewModel.appendImages[index])
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 80, height: 80)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -74,6 +110,18 @@ struct ChatView: View {
         .onAppear {
             Task {
                 await viewModel.fetchMessages()
+            }
+        }
+        .onChange(of: viewModel.appendItems) { newItems, _ in
+            Task {
+                for item in newItems {
+                    if let data = try? await item.loadTransferable(type: Data.self) {
+                        if let image = UIImage(data: data) {
+                            viewModel.addImage(image)
+                        }
+                    }
+                }
+                viewModel.appendItems.removeAll()
             }
         }
     }

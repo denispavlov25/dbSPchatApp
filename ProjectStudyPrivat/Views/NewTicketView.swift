@@ -33,7 +33,13 @@ struct NewTicketView: View {
                     .padding(.bottom, 30)
                 
                 //adding photos
-                PhotosPicker("Append Photos", selection: $viewModel.appendItems, maxSelectionCount: 5, selectionBehavior: .ordered)
+                HStack {
+                    Image(systemName: "paperclip")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 15, height:15)
+                    PhotosPicker("Append Photos", selection: $viewModel.appendItems, maxSelectionCount: 5, selectionBehavior: .ordered)
+                }
                 
                 Spacer()
                 
