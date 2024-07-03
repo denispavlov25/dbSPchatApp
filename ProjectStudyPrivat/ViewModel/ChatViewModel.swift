@@ -17,6 +17,9 @@ class ChatViewModel: ObservableObject {
     @Published var messages: [Message] = []
     @Published var appendImages: [UIImage] = []
     @Published var appendItems: [PhotosPickerItem] = []
+    @Published var isImageFullScreenPresented = false
+    @Published var selectedImageURL: String = ""
+    @Published var isUploadingImages = false
     
     private let ticket: Ticket
     private let ref: DatabaseReference
@@ -40,7 +43,9 @@ class ChatViewModel: ObservableObject {
         let messageId = UUID().uuidString
         //get standard timestamp
         let unixTimestamp = Date().timeIntervalSince1970
-        //creating a dictionary containing the message data
+        
+        //setting flag to indicate image upload in progress
+        isUploadingImages = true
         
         if !appendImages.isEmpty {
             Task {
@@ -55,6 +60,10 @@ class ChatViewModel: ObservableObject {
                     sendMessage(messageId: messageId, messageDict: messageDict)
                 } catch {
                     print("Error uploading images: \(error.localizedDescription)")
+                }
+                //updating isUploadingImages on the main thread
+                DispatchQueue.main.async {
+                    self.isUploadingImages = false
                 }
             }
         } else {
@@ -145,5 +154,15 @@ class ChatViewModel: ObservableObject {
         } catch {
             print("Failed to fetch messages: \(error.localizedDescription)")
         }
+    }
+    
+    func openImage(_ imageURL: String) {
+        selectedImageURL = imageURL
+        isImageFullScreenPresented = true
+    }
+
+    func closeImageFullScreen() {
+        isImageFullScreenPresented = false
+        selectedImageURL = ""
     }
 }

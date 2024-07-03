@@ -11,6 +11,7 @@ import PhotosUI
 struct ChatView: View {
     @StateObject private var viewModel: ChatViewModel
     @Environment(\.dismiss) private var dismiss
+    @State private var isSheetPresented = false
     
     var ticket: Ticket
     
@@ -29,16 +30,15 @@ struct ChatView: View {
                             ForEach(viewModel.messages) { message in
                                 if let imageURLs = message.appendedImages {
                                     ForEach(imageURLs, id: \.self) { url in
-                                        if let imageURL = URL(string: url) {
-                                            AsyncImage(url: imageURL) { image in
-                                                image
-                                                    .resizable()
-                                                    .aspectRatio(contentMode: .fill)
-                                                    .frame(width: 80, height: 80)
-                                                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                                            } placeholder: {
-                                                ProgressView()
-                                            }
+                                        Button(action: {
+                                            viewModel.openImage(url)
+                                            isSheetPresented = true
+                                        }) {
+                                            Text("Open Image")
+                                                .foregroundColor(.blue)
+                                                .padding()
+                                                .background(Color.white)
+                                                .clipShape(RoundedRectangle(cornerRadius: 10))
                                         }
                                     }
                                 } else {
@@ -72,12 +72,16 @@ struct ChatView: View {
                     Button(action: {
                         viewModel.handleSend()
                     }) {
-                        Text("Send")
-                            .foregroundColor(.white)
-                            .padding(.vertical, 10)
-                            .padding(.horizontal, 20)
-                            .background(Color.blue)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                        if viewModel.isUploadingImages {
+                            ProgressView()
+                        } else {
+                            Text("Send")
+                                .foregroundColor(.white)
+                                .padding(.vertical, 10)
+                                .padding(.horizontal, 20)
+                                .background(Color.blue)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                        }
                     }
                     .padding()
                 }
@@ -124,6 +128,33 @@ struct ChatView: View {
                 viewModel.appendItems.removeAll()
             }
         }
+        .sheet(isPresented: $isSheetPresented, onDismiss: {
+            viewModel.closeImageFullScreen()
+        }, content: {
+            NavigationStack {
+                VStack {
+                    if let imageURL = URL(string: viewModel.selectedImageURL) {
+                        AsyncImage(url: imageURL) { image in
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        } placeholder: {
+                            ProgressView()
+                        }
+                    }
+                }
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: {
+                            isSheetPresented = false
+                        }) {
+                            Text("Close")
+                        }
+                    }
+                }
+            }
+        })
     }
 }
 
