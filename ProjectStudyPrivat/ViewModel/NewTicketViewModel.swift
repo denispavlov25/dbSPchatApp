@@ -67,7 +67,7 @@ class NewTicketViewModel: ObservableObject {
         
         for (index, image) in appendImages.enumerated() {
             //converting the UIImage to JPEG data
-            guard let imageData = image.jpegData(compressionQuality: 0.8) else { continue }
+            guard let imageData = image.jpegData(compressionQuality: 0.4) else { continue }
             //creating a reference in firebase for the image with a unique name
             let imageRef = storageRef.child("\(reference)_\(index).jpg")
             

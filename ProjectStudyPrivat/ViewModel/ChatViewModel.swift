@@ -60,9 +60,6 @@ class ChatViewModel: ObservableObject {
                     sendMessage(messageId: messageId, messageDict: messageDict)
                 } catch {
                     print("Error uploading images: \(error.localizedDescription)")
-                }
-                //updating isUploadingImages on the main thread
-                DispatchQueue.main.async {
                     self.isUploadingImages = false
                 }
             }
@@ -94,6 +91,7 @@ class ChatViewModel: ObservableObject {
                     await self.fetchMessages()
                 }
             }
+            self.isUploadingImages = false
         }
     }
     
@@ -101,8 +99,10 @@ class ChatViewModel: ObservableObject {
         var imageURLs: [String] = []
         
         for (index, image) in appendImages.enumerated() {
-            guard let imageData = image.jpegData(compressionQuality: 0.8) else { continue }
-            let imageRef = self.storageRef.child("\(ticket.id.uuidString)_\(index).jpg")
+            guard let imageData = image.jpegData(compressionQuality: 0.4) else { continue }
+            
+            let uniqueImageId = UUID().uuidString
+            let imageRef = self.storageRef.child("\(ticket.id.uuidString)_\(messageId)_\(uniqueImageId).jpg")
             
             do {
                 _ = try await imageRef.putDataAsync(imageData)

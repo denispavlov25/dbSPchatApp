@@ -28,7 +28,7 @@ struct ChatView: View {
                         Spacer()
                         VStack(alignment: .trailing, spacing: 10) {
                             ForEach(viewModel.messages) { message in
-                                if let imageURLs = message.appendedImages {
+                                if let imageURLs = message.appendedImages, !imageURLs.isEmpty {
                                     ForEach(imageURLs, id: \.self) { url in
                                         Button(action: {
                                             viewModel.openImage(url)
@@ -41,7 +41,8 @@ struct ChatView: View {
                                                 .clipShape(RoundedRectangle(cornerRadius: 10))
                                         }
                                     }
-                                } else {
+                                }
+                                if !message.text.isEmpty {
                                     Text(message.text)
                                         .padding()
                                         .foregroundColor(.white)
