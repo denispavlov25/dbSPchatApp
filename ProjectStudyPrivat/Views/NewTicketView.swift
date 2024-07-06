@@ -118,5 +118,5 @@ struct NewTicketView: View {
 }
 
 #Preview {
-    NewTicketView(openTicketsViewModel: OpenTicketsViewModel())
+    NewTicketView(openTicketsViewModel: OpenTicketsViewModel(isSupportAccount: true))
 }

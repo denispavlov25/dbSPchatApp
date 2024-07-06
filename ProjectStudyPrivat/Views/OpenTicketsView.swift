@@ -8,9 +8,16 @@
 import SwiftUI
 
 struct OpenTicketsView: View {
-    @StateObject private var viewModel = OpenTicketsViewModel()
+    @StateObject private var viewModel: OpenTicketsViewModel
     @State private var selectedTicket: Ticket?
     @State private var showingAlert = false
+    
+    var loginViewModel: LoginViewModel
+    
+    init(loginViewModel: LoginViewModel) {
+        _viewModel = StateObject(wrappedValue: OpenTicketsViewModel(isSupportAccount: loginViewModel.isSupportAccount))
+        self.loginViewModel = loginViewModel
+    }
 
     var body: some View {
         NavigationStack {
@@ -92,5 +99,5 @@ struct OpenTicketsView: View {
 }
 
 #Preview {
-    OpenTicketsView()
+    OpenTicketsView(loginViewModel: LoginViewModel())
 }

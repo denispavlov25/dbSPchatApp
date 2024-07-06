@@ -34,6 +34,15 @@ struct LoginView: View {
                                 .frame(width: 128, height: 128)
                                 .clipShape(.circle)
                         }
+                        HStack {
+                            Image(systemName: viewModel.isSupportAccount ? "checkmark.square" : "square")
+                                .onTapGesture {
+                                    viewModel.isSupportAccount.toggle()
+                                }
+                            Text("Support account")
+                        }
+                        .foregroundStyle(.black)
+                        .padding()
                     }
                     
                     //email and passwort fields
@@ -93,7 +102,7 @@ struct LoginView: View {
             .background(Color(.init(white: 0, alpha: 0.05)))
             //navigating to the OpenTicketsView
             .navigationDestination(isPresented: $viewModel.shouldNavigate) {
-                OpenTicketsView()
+                OpenTicketsView(loginViewModel: viewModel)
             }
             
         }

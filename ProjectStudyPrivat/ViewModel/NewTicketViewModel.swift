@@ -26,7 +26,7 @@ class NewTicketViewModel: ObservableObject {
         guard let userID = Auth.auth().currentUser?.uid else {
             fatalError("Current user ID not found")
         }
-        self.ref = Database.database().reference().child("users").child(userID).child("tickets")
+        self.ref = Database.database().reference().child("users").child("regularAccounts").child(userID).child("tickets")
     }
 
     func saveTicket() async -> Ticket? {
