@@ -58,7 +58,7 @@ struct OpenTicketsView: View {
             //tickets are passed to the TicketRowView
             List {
                 ForEach(viewModel.tickets) { ticket in
-                    TicketRowView(selectedTicket: $selectedTicket, ticket: ticket)
+                    TicketRowView(selectedTicket: $selectedTicket, ticket: ticket, isSupportAccount: loginViewModel.isSupportAccount)
                         .swipeActions(edge: .trailing) {
                             Button(action: {
                                 selectedTicket = ticket

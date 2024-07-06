@@ -13,6 +13,7 @@ struct TicketRowView: View {
     @State private var isHighlighted: Bool = false
     
     let ticket: Ticket
+    let isSupportAccount: Bool
     
     var body: some View {
         HStack {
@@ -23,7 +24,7 @@ struct TicketRowView: View {
                     .foregroundStyle(Color.black)
             }
             .sheet(isPresented: $viewModel.navigateToChatView, content: {
-                ChatView(ticket: ticket)
+                ChatView(ticket: ticket, isSupportAccount: isSupportAccount)
             })
             
             Spacer()
@@ -46,5 +47,5 @@ struct TicketRowView: View {
 }
 
 #Preview {
-    TicketRowView(selectedTicket: .constant(nil), ticket: Ticket(id: UUID(), reference: "Example Ticket", description: "Example Description"))
+    TicketRowView(selectedTicket: .constant(nil), ticket: Ticket(id: UUID(), reference: "Example Ticket", description: "Example Description"), isSupportAccount: true)
 }

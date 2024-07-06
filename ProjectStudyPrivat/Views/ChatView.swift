@@ -14,10 +14,12 @@ struct ChatView: View {
     @State private var isSheetPresented = false
     
     var ticket: Ticket
+    var isSupportAccount: Bool
     
-    init(ticket: Ticket) {
+    init(ticket: Ticket, isSupportAccount: Bool) {
+        _viewModel = StateObject(wrappedValue: ChatViewModel(ticket: ticket, isSupportAccount: isSupportAccount))
         self.ticket = ticket
-        _viewModel = StateObject(wrappedValue: ChatViewModel(ticket: ticket))
+        self.isSupportAccount = isSupportAccount
     }
     
     var body: some View {
@@ -160,5 +162,5 @@ struct ChatView: View {
 }
 
 #Preview {
-    ChatView(ticket: Ticket(id: UUID(), reference: "Example Ticket", description: "Example Description"))
+    ChatView(ticket: Ticket(id: UUID(), reference: "Example Ticket", description: "Example Description"), isSupportAccount: true)
 }

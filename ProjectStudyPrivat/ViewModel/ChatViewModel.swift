@@ -24,14 +24,21 @@ class ChatViewModel: ObservableObject {
     private let ticket: Ticket
     private let ref: DatabaseReference
     private let storageRef: StorageReference
+    var isSupportAccount: Bool
     
-    init(ticket: Ticket) {
+    init(ticket: Ticket, isSupportAccount: Bool) {
         self.ticket = ticket
-
-        guard let userID = Auth.auth().currentUser?.uid else {
-            fatalError("Current user ID not found")
+        self.isSupportAccount = isSupportAccount
+        
+        if isSupportAccount {
+            self.ref = Database.database().reference().child("users").child("regularAccounts")
+        } else {
+            guard let userID = Auth.auth().currentUser?.uid else {
+                fatalError("Current user ID not found")
+            }
+            self.ref = Database.database().reference().child("users").child("regularAccounts").child(userID).child("tickets").child(ticket.id.uuidString).child("messages")
         }
-        self.ref = Database.database().reference().child("users").child(userID).child("tickets").child(ticket.id.uuidString).child("messages")
+        
         self.storageRef = Storage.storage().reference().child("ticket_images")
     }
     
@@ -98,7 +105,7 @@ class ChatViewModel: ObservableObject {
     private func uploadImages(messageId: String) async throws -> [String] {
         var imageURLs: [String] = []
         
-        for (index, image) in appendImages.enumerated() {
+        for (_, image) in appendImages.enumerated() {
             guard let imageData = image.jpegData(compressionQuality: 0.4) else { continue }
             
             let uniqueImageId = UUID().uuidString
@@ -132,20 +139,38 @@ class ChatViewModel: ObservableObject {
             DispatchQueue.main.async {
                 var fetchedMessages: [Message] = []
                 
-                for child in snapshot.children.allObjects as! [DataSnapshot] {
-                    guard let messageDict = child.value as? [String: Any],
-                          let text = messageDict["text"] as? String,
-                          let timestamp = messageDict["timestamp"] as? Double else {
-                        continue
+                if self.isSupportAccount {
+                    //iterating through users
+                    for userSnapshot in snapshot.children.allObjects as! [DataSnapshot] {
+                        let ticketsSnapshot = userSnapshot.childSnapshot(forPath: "tickets")
+                        
+                        //iterating through tickets
+                        for ticketSnapshot in ticketsSnapshot.children.allObjects as! [DataSnapshot] {
+                            let ticketId = ticketSnapshot.key
+                            
+                            //checking if the ticket id matches the current ticket
+                            if ticketId == self.ticket.id.uuidString {
+                                let messagesSnapshot = ticketSnapshot.childSnapshot(forPath: "messages")
+                                
+                                //iterating through messages
+                                for messageSnapshot in messagesSnapshot.children.allObjects as! [DataSnapshot] {
+                                    if let message = self.parseMessage(snapshot: messageSnapshot) {
+                                        fetchedMessages.append(message)
+                                    } else {
+                                        print("Failed to parse message snapshot: \(messageSnapshot.key)")
+                                    }
+                                }
+                            }
+                        }
                     }
-                    
-                    let appendedImages = messageDict["appendedImages"] as? [String]
-
-                    if let messageId = UUID(uuidString: child.key) {
-                        let message = Message(id: messageId, text: text, timestamp: timestamp, appendedImages: appendedImages)
-                        fetchedMessages.append(message)
-                    } else {
-                        print("Invalid UUID string: \(child.key)")
+                } else {
+                    //fetching messages for regular user
+                    for messageSnapshot in snapshot.children.allObjects as! [DataSnapshot] {
+                        if let message = self.parseMessage(snapshot: messageSnapshot) {
+                            fetchedMessages.append(message)
+                        } else {
+                            print("Failed to parse message snapshot: \(messageSnapshot.key)")
+                        }
                     }
                 }
                 
@@ -153,6 +178,23 @@ class ChatViewModel: ObservableObject {
             }
         } catch {
             print("Failed to fetch messages: \(error.localizedDescription)")
+        }
+    }
+
+    private func parseMessage(snapshot: DataSnapshot) -> Message? {
+        guard let messageDict = snapshot.value as? [String: Any],
+              let text = messageDict["text"] as? String,
+              let timestamp = messageDict["timestamp"] as? Double else {
+            return nil
+        }
+
+        let appendedImages = messageDict["appendedImages"] as? [String]
+
+        if let messageId = UUID(uuidString: snapshot.key) {
+            return Message(id: messageId, text: text, timestamp: timestamp, appendedImages: appendedImages)
+        } else {
+            print("Invalid UUID string: \(snapshot.key)")
+            return nil
         }
     }
     
