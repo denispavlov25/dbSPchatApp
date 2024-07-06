@@ -16,7 +16,7 @@ class OpenTicketsViewModel: ObservableObject {
     @Published var tickets: [Ticket] = []
     
     private let ref: DatabaseReference
-    private var isSupportAccount: Bool
+    var isSupportAccount: Bool
     
     init(isSupportAccount: Bool) {
         self.isSupportAccount = isSupportAccount

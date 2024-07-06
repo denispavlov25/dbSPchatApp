@@ -83,16 +83,18 @@ struct OpenTicketsView: View {
                     Image(systemName: "line.3.horizontal")
                 })
             }
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    //opening the sheet to create a new ticket
-                    viewModel.showNewTicketDialog()
-                }, label: {
-                    Image(systemName: "plus")
-                })
-                .sheet(isPresented: $viewModel.isAddButtonClicked, content: {
-                    NewTicketView(openTicketsViewModel: viewModel)
-                })
+            if !viewModel.isSupportAccount {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        //opening the sheet to create a new ticket
+                        viewModel.showNewTicketDialog()
+                    }, label: {
+                        Image(systemName: "plus")
+                    })
+                    .sheet(isPresented: $viewModel.isAddButtonClicked, content: {
+                        NewTicketView(openTicketsViewModel: viewModel)
+                    })
+                }
             }
         }
     }
