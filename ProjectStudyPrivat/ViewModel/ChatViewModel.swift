@@ -58,11 +58,13 @@ class ChatViewModel: ObservableObject {
             Task {
                 do {
                     let imageUrls = try await uploadImages(messageId: messageId)
-                    let messageDict: [String: Any] = [
+                    var messageDict: [String: Any] = [
                         "text": chatText,
                         "timestamp": unixTimestamp,
                         "appendedImages": imageUrls
                     ]
+                    //setting isSupportMessage based on isSupportAccount
+                    messageDict["isSupportMessage"] = isSupportAccount
                     
                     sendMessage(messageId: messageId, messageDict: messageDict)
                 } catch {
@@ -71,20 +73,48 @@ class ChatViewModel: ObservableObject {
                 }
             }
         } else {
-            let messageDict: [String: Any] = [
+            var messageDict: [String: Any] = [
                 "text": chatText,
                 "timestamp": unixTimestamp
             ]
+            messageDict["isSupportMessage"] = isSupportAccount
+            
             sendMessage(messageId: messageId, messageDict: messageDict)
         }
     }
         
     private func sendMessage(messageId: String, messageDict: [String: Any]) {
-        //reference to the specific message
-        let messageRef = ref.child(messageId)
-        
-        //set the message data to the firebase
-        messageRef.setValue(messageDict) { error, _ in
+        if isSupportAccount {
+            let usersRef = Database.database().reference().child("users").child("regularAccounts")
+            
+            usersRef.observeSingleEvent(of: .value) { [weak self] (snapshot) in
+                guard let self = self else { return }
+                
+                for userSnapshot in snapshot.children.allObjects as! [DataSnapshot] {
+                    let ticketsSnapshot = userSnapshot.childSnapshot(forPath: "tickets")
+                    
+                    for ticketSnapshot in ticketsSnapshot.children.allObjects as! [DataSnapshot] {
+                        let ticketId = ticketSnapshot.key
+                        
+                        if ticketId == self.ticket.id.uuidString {
+                            let messagesRef = ticketSnapshot.ref.child("messages").child(messageId)
+                            self.sendMessageToDatabase(messagesRef: messagesRef, messageDict: messageDict)
+                            return
+                        }
+                    }
+                }
+            }
+        } else {
+            //for regular user account, using the existing path logic
+            let messageRef = self.ref.child(messageId)
+            self.sendMessageToDatabase(messagesRef: messageRef, messageDict: messageDict)
+        }
+    }
+
+    private func sendMessageToDatabase(messagesRef: DatabaseReference, messageDict: [String: Any]) {
+        messagesRef.setValue(messageDict) { [weak self] (error, _) in
+            guard let self = self else { return }
+            
             if let error = error {
                 print("Error sending message: \(error.localizedDescription)")
             } else {
@@ -184,14 +214,15 @@ class ChatViewModel: ObservableObject {
     private func parseMessage(snapshot: DataSnapshot) -> Message? {
         guard let messageDict = snapshot.value as? [String: Any],
               let text = messageDict["text"] as? String,
-              let timestamp = messageDict["timestamp"] as? Double else {
+              let timestamp = messageDict["timestamp"] as? Double,
+              let isSupportMessage = messageDict["isSupportMessage"] as? Bool else {
             return nil
         }
 
         let appendedImages = messageDict["appendedImages"] as? [String]
 
         if let messageId = UUID(uuidString: snapshot.key) {
-            return Message(id: messageId, text: text, timestamp: timestamp, appendedImages: appendedImages)
+            return Message(id: messageId, text: text, timestamp: timestamp, appendedImages: appendedImages, isSupportMessage: isSupportMessage)
         } else {
             print("Invalid UUID string: \(snapshot.key)")
             return nil

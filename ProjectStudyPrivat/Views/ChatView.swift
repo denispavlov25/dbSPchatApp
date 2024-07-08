@@ -28,28 +28,38 @@ struct ChatView: View {
                 ScrollView {
                     HStack {
                         Spacer()
-                        VStack(alignment: .trailing, spacing: 10) {
+                        VStack(spacing: 10) {
                             ForEach(viewModel.messages) { message in
-                                if let imageURLs = message.appendedImages, !imageURLs.isEmpty {
-                                    ForEach(imageURLs, id: \.self) { url in
-                                        Button(action: {
-                                            viewModel.openImage(url)
-                                            isSheetPresented = true
-                                        }) {
-                                            Text("Open Image")
-                                                .foregroundColor(.blue)
+                                HStack {
+                                    if message.isSupportMessage == isSupportAccount {
+                                        Spacer()
+                                    }
+                                    VStack(alignment: message.isSupportMessage == isSupportAccount ? .trailing : .leading) {
+                                        if let imageURLs = message.appendedImages, !imageURLs.isEmpty {
+                                            ForEach(imageURLs, id: \.self) { url in
+                                                Button(action: {
+                                                    viewModel.openImage(url)
+                                                    isSheetPresented = true
+                                                }) {
+                                                    Text("Open Image")
+                                                        .foregroundColor(.blue)
+                                                        .padding()
+                                                        .background(Color.white)
+                                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                                                }
+                                            }
+                                        }
+                                        if !message.text.isEmpty {
+                                            Text(message.text)
                                                 .padding()
-                                                .background(Color.white)
+                                                .foregroundColor(message.isSupportMessage == isSupportAccount ? .white : .black)
+                                                .background(message.isSupportMessage == isSupportAccount ? Color.blue : Color.white)
                                                 .clipShape(RoundedRectangle(cornerRadius: 10))
                                         }
                                     }
-                                }
-                                if !message.text.isEmpty {
-                                    Text(message.text)
-                                        .padding()
-                                        .foregroundColor(.white)
-                                        .background(Color.blue)
-                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    if message.isSupportMessage != isSupportAccount {
+                                        Spacer()
+                                    }
                                 }
                             }
                         }

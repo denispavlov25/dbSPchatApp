@@ -12,4 +12,5 @@ struct Message: Identifiable {
     var text: String
     var timestamp: Double
     var appendedImages: [String]?
+    var isSupportMessage: Bool
 }
