@@ -34,9 +34,10 @@ struct OpenTicketsView: View {
             }
         }
         .onAppear {
-            Task {
-                await viewModel.fetchTickets()
-            }
+            viewModel.startListeningForTickets()
+        }
+        .onDisappear {
+            viewModel.stopListeningForTickets()
         }
         .alert(isPresented: $showingAlert) {
             Alert(
@@ -60,13 +61,15 @@ struct OpenTicketsView: View {
                 ForEach(viewModel.tickets) { ticket in
                     TicketRowView(selectedTicket: $selectedTicket, ticket: ticket, isSupportAccount: loginViewModel.isSupportAccount)
                         .swipeActions(edge: .trailing) {
-                            Button(action: {
-                                selectedTicket = ticket
-                                showingAlert = true
-                            }) {
-                                Text("Close ticket")
+                            if !viewModel.isSupportAccount {
+                                Button(action: {
+                                    selectedTicket = ticket
+                                    showingAlert = true
+                                }) {
+                                    Text("Close ticket")
+                                }
+                                .tint(.red)
                             }
-                            .tint(.red)
                         }
                 }
             }

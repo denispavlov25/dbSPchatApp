@@ -125,9 +125,10 @@ struct ChatView: View {
             }
         }
         .onAppear {
-            Task {
-                await viewModel.fetchMessages()
-            }
+            viewModel.startListeningForMessages()
+        }
+        .onDisappear {
+            viewModel.stopListeningForMessages()
         }
         .onChange(of: viewModel.appendItems) { newItems, _ in
             Task {

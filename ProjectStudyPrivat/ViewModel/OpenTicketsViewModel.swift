@@ -16,6 +16,7 @@ class OpenTicketsViewModel: ObservableObject {
     @Published var tickets: [Ticket] = []
     
     private let ref: DatabaseReference
+    private var ticketsListenerHandle: DatabaseHandle?
     var isSupportAccount: Bool
     
     init(isSupportAccount: Bool) {
@@ -40,7 +41,9 @@ class OpenTicketsViewModel: ObservableObject {
     }
     
     func addTicket(_ ticket: Ticket) {
-        tickets.append(ticket)
+        if !tickets.contains(where: { $0.id == ticket.id }) {
+            tickets.append(ticket)
+        }
     }
     
     func closeTicket(_ ticket: Ticket) {
@@ -59,6 +62,24 @@ class OpenTicketsViewModel: ObservableObject {
         }
     }
     
+    func startListeningForTickets() {
+        ticketsListenerHandle = ref.observe(.value) { [weak self] snapshot in
+            self?.handleTicketsSnapshot(snapshot)
+        }
+    }
+        
+    func stopListeningForTickets() {
+        if let handle = ticketsListenerHandle {
+            ref.removeObserver(withHandle: handle)
+        }
+    }
+    
+    private func handleTicketsSnapshot(_ snapshot: DataSnapshot) {
+        DispatchQueue.main.async {
+            self.tickets = self.parseTickets(snapshot: snapshot, forSupportAccount: self.isSupportAccount)
+        }
+    }
+    
     func fetchTickets() async {
         do {
             //fetch data from firebase asynchronously
@@ -66,15 +87,7 @@ class OpenTicketsViewModel: ObservableObject {
             
             //going to the main ui thread to update ui components
             DispatchQueue.main.async {
-                var fetchedTickets: [Ticket] = []
-                
-                if self.isSupportAccount {
-                    fetchedTickets = self.parseTickets(snapshot: snapshot, forSupportAccount: true)
-                } else {
-                    fetchedTickets = self.parseTickets(snapshot: snapshot, forSupportAccount: false)
-                }
-                //updating tickets with fetchedTickets on the main ui thread
-                self.tickets = fetchedTickets
+                self.tickets = self.parseTickets(snapshot: snapshot, forSupportAccount: self.isSupportAccount)
             }
         } catch {
             print("Failed to fetch tickets: \(error.localizedDescription)")
