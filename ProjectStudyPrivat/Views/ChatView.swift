@@ -67,7 +67,7 @@ struct ChatView: View {
                     .padding()
                 }
                 .background(Color(.init(white: 0, alpha: 0.05)))
-                .navigationTitle("Chat with Support")
+                .navigationTitle(isSupportAccount ? "Chat with user" : "Chat with Support")
                 .navigationBarTitleDisplayMode(.inline)
                 
                 HStack {
